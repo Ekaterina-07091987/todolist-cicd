@@ -7,16 +7,16 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
-  const API_URL = "https://todolist-cicd-1-gd7w.onrender.com/api/tasks";
-  const API_KEY = "my-secret-key";
+  const API_URL = "/api/tasks";
 
   useEffect(() => {
-    fetch(API_URL, {
-      headers: { "x-api-key": API_KEY },
-    })
-      .then((res) => res.json())
+    fetch(API_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Ошибка HTTP: ${res.status}`);
+        return res.json();
+      })
       .then(setTasks)
-      .catch((err) => console.error("Ошибка:", err));
+      .catch((err) => console.error("Ошибка загрузки задач:", err));
   }, []);
 
   const handleAddTask = async () => {
@@ -25,51 +25,50 @@ function App() {
     try {
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: inputValue }),
       });
+
+      if (!res.ok) throw new Error(`Ошибка HTTP: ${res.status}`);
 
       const newTask = await res.json();
       setTasks((prev) => [...prev, newTask]);
       setInputValue("");
-    } catch (e) {
-      console.error("Ошибка при добавлении", e);
+    } catch (err) {
+      console.error("Ошибка при добавлении задачи:", err);
     }
   };
 
   const handleDeleteTask = async (id) => {
     try {
-      await fetch(`${API_URL}/${id}`, {
+      const res = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
         method: "DELETE",
-        headers: { "x-api-key": API_KEY },
       });
 
-      setTasks((prev) => prev.filter((t) => t.id !== id));
-    } catch (e) {
-      console.error("Ошибка при удалении", e);
+      if (!res.ok) throw new Error(`Ошибка HTTP: ${res.status}`);
+
+      setTasks((prev) => prev.filter((task) => task.id !== id));
+    } catch (err) {
+      console.error("Ошибка при удалении задачи:", err);
     }
   };
 
   const handleUpdateTask = async (id, newText) => {
     try {
-      const res = await fetch(`${API_URL}/${id}`, {
+      const res = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: newText }),
       });
 
-      const updated = await res.json();
+      if (!res.ok) throw new Error(`Ошибка HTTP: ${res.status}`);
+
+      const updatedTask = await res.json();
       setTasks((prev) =>
-        prev.map((t) => (t.id === id ? updated : t))
+        prev.map((task) => (task.id === id ? updatedTask : task))
       );
-    } catch (e) {
-      console.error("Ошибка при обновлении", e);
+    } catch (err) {
+      console.error("Ошибка при обновлении задачи:", err);
     }
   };
 
