@@ -7,7 +7,7 @@ function App() {
   const [tasks, setTasks] = useState([]);
   const [inputValue, setInputValue] = useState("");
 
-  const API_URL = "http://localhost:4000/api/tasks";
+  const API_URL = "https://todolist-cicd-1-gd7w.onrender.com/api/tasks";
   const API_KEY = "my-secret-key";
 
   useEffect(() => {
