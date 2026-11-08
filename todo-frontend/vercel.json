@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://todolist-cicd-backend.vercel.app/api/:path*"
+    }
+  ]
+}
